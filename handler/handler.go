@@ -11,6 +11,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/ShintaNakama/my-graphql-example/domain/repository"
 	"github.com/ShintaNakama/my-graphql-example/graph"
+	"github.com/ShintaNakama/my-graphql-example/graph/directive"
+	"github.com/ShintaNakama/my-graphql-example/middleware"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -19,6 +21,8 @@ func RegisterGQLHandlers(repo repository.Repository) {
 	r := graph.NewResolver(repo)
 
 	gqlconfig := graph.Config{Resolvers: r}
+	d := directive.NewDirective()
+	gqlconfig.Directives.Mask = d.Mask
 
 	server := handler.NewDefaultServer(graph.NewExecutableSchema(gqlconfig))
 
@@ -34,5 +38,5 @@ func RegisterGQLHandlers(repo repository.Repository) {
 	})
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", server)
+	http.Handle("/query", middleware.GetRoleKeyFromHeader(server))
 }

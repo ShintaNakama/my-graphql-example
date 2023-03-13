@@ -1,6 +1,11 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
+"""
+mask directiveが付与されたフィールドはroleによってマスキングされる
+"""
+directive @mask(roles: [Role!]!) on FIELD_DEFINITION
+
+enum Role {
+  ADMINISTRATOR
+}
 
 type Todo {
   id: ID!
@@ -11,7 +16,7 @@ type Todo {
 
 type User {
   id: ID!
-  name: String!
+  name: String! @mask(roles: [ADMINISTRATOR])
 }
 
 type Query {
